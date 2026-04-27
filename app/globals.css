@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Surface — warm cream base; card stays pure white for photo legibility */
+    --background: 30 100% 96%;        /* #FFF7ED cream */
+    --foreground: 20 40% 15%;         /* warm dark #3B2614 */
+    --card: 0 0% 100%;                 /* pure white */
+    --card-foreground: 20 40% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 40% 15%;
+
+    /* Brand */
+    --primary: 21 90% 48%;            /* appetite orange #EA580C */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 21 100% 62%;      /* gradient end #FF8A3D */
+
+    --accent: 221 83% 53%;            /* trust blue #2563EB */
+    --accent-foreground: 0 0% 100%;
+
+    /* Warm neutrals */
+    --secondary: 30 50% 94%;          /* #FDF4F0 warm muted */
+    --secondary-foreground: 20 40% 15%;
+    --muted: 30 50% 94%;
+    --muted-foreground: 25 17% 41%;   /* #7A6557 warm gray, AA on cream */
+
+    /* UI */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 19 70% 92%;              /* #FCEAE1 */
+    --input: 19 70% 92%;
+    --ring: 21 90% 48%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark mode refinement deferred — kept for future phase */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 21 95% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 21 100% 68%;
+    --accent: 221 83% 60%;
+    --accent-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 21 95% 58%;
+  }
+
+  * { @apply border-border; }
+  html, body { height: 100%; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /*
+   * Reduced-motion handled PER-COMPONENT (qua `usePrefersReducedMotion` hook
+   * trong Lottie + skeleton + hero bowl). Bỏ blanket `*` override vì nó kill
+   * cả functional progress indicators (typing dots, checklist) — user vẫn
+   * cần thấy "system đang chạy" kể cả khi prefer reduce.
+   *
+   * Decorative animations (float, glow, breath) sẽ tự skip ở component level.
+   */
+}
+
+/* iOS Safari viewport + safe area helpers. */
+.h-dvh { height: 100dvh; }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pt-safe { padding-top: env(safe-area-inset-top); }

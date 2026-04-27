@@ -1,0 +1,212 @@
+[
+  {
+    "id": "mood-01",
+    "dimension": "mood",
+    "query": "buồn quá ăn gì cho đỡ buồn",
+    "expected_fields": ["mood", "comfort_food", "location"],
+    "notes": "Should suggest comfort food, warm tone"
+  },
+  {
+    "id": "mood-02",
+    "dimension": "mood",
+    "query": "vui vui đi ăn gì cho vui thêm",
+    "expected_fields": ["mood", "location", "group_context"],
+    "notes": "Celebratory/social tone expected"
+  },
+  {
+    "id": "mood-03",
+    "dimension": "mood",
+    "query": "cần an ủi sau ngày dài mệt mỏi",
+    "expected_fields": ["mood", "comfort_food", "time"],
+    "notes": "Empathetic tone, warm/homey food"
+  },
+  {
+    "id": "mood-04",
+    "dimension": "mood",
+    "query": "ăn gì chill xem phim tối nay",
+    "expected_fields": ["mood", "time", "location"],
+    "notes": "Casual, light food suitable for evening"
+  },
+  {
+    "id": "mood-05",
+    "dimension": "mood",
+    "query": "stress công việc muốn ăn gì giải tỏa",
+    "expected_fields": ["mood", "comfort_food", "location"],
+    "notes": "Should acknowledge stress context"
+  },
+  {
+    "id": "weather-01",
+    "dimension": "weather",
+    "query": "mưa lạnh nóng người muốn ăn gì",
+    "expected_fields": ["weather", "hot_food", "indoor_seating"],
+    "notes": "Should prioritize hot dishes, indoor venues"
+  },
+  {
+    "id": "weather-02",
+    "dimension": "weather",
+    "query": "nắng 35 độ ăn gì cho mát",
+    "expected_fields": ["weather", "cold_food", "temperature"],
+    "notes": "Cool food, chè, sinh tố expected"
+  },
+  {
+    "id": "weather-03",
+    "dimension": "weather",
+    "query": "se se lạnh muốn ăn gì ấm bụng",
+    "expected_fields": ["weather", "hot_food", "temperature"],
+    "notes": "Mild cold, warm soups/noodles"
+  },
+  {
+    "id": "weather-04",
+    "dimension": "weather",
+    "query": "mưa nhỏ ngại đi xa muốn ăn gần nhà",
+    "expected_fields": ["weather", "location", "distance"],
+    "notes": "Should suggest nearby venues"
+  },
+  {
+    "id": "weather-05",
+    "dimension": "weather",
+    "query": "trời âm u ăn gì cho hợp không khí",
+    "expected_fields": ["weather", "mood", "food_type"],
+    "notes": "Overcast mood-matching food"
+  },
+  {
+    "id": "dietary-01",
+    "dimension": "dietary",
+    "query": "mình ăn chay hôm nay ăn gì",
+    "expected_fields": ["dietary", "location", "food_type"],
+    "notes": "Must only suggest vegetarian options"
+  },
+  {
+    "id": "dietary-02",
+    "dimension": "dietary",
+    "query": "không ăn cay được gợi ý quán nào",
+    "expected_fields": ["dietary", "location", "restriction"],
+    "notes": "Must exclude spicy dishes explicitly"
+  },
+  {
+    "id": "dietary-03",
+    "dimension": "dietary",
+    "query": "ăn ít dầu mỡ cho lành mạnh",
+    "expected_fields": ["dietary", "health", "food_type"],
+    "notes": "Light, low-oil options"
+  },
+  {
+    "id": "dietary-04",
+    "dimension": "dietary",
+    "query": "dị ứng hải sản không ăn được đồ biển",
+    "expected_fields": ["dietary", "restriction", "safety"],
+    "notes": "CRITICAL: must not suggest seafood at all"
+  },
+  {
+    "id": "dietary-05",
+    "dimension": "dietary",
+    "query": "đang ăn keto gợi ý quán hợp",
+    "expected_fields": ["dietary", "keto", "food_type"],
+    "notes": "Low-carb options, no rice/noodle focused"
+  },
+  {
+    "id": "budget-01",
+    "dimension": "budget",
+    "query": "rẻ thôi ăn gì dưới 50k",
+    "expected_fields": ["budget", "price_level", "location"],
+    "notes": "Budget constraint must be respected"
+  },
+  {
+    "id": "budget-02",
+    "dimension": "budget",
+    "query": "muốn sang một chút hôm nay",
+    "expected_fields": ["budget", "price_level", "ambiance"],
+    "notes": "Higher price tier, nicer ambiance"
+  },
+  {
+    "id": "budget-03",
+    "dimension": "budget",
+    "query": "ăn gì dưới 100k no được không",
+    "expected_fields": ["budget", "price_level", "portion"],
+    "notes": "Mid-range budget"
+  },
+  {
+    "id": "budget-04",
+    "dimension": "budget",
+    "query": "tiền ít mà đói to ăn gì cho no",
+    "expected_fields": ["budget", "portion", "value"],
+    "notes": "Value for money emphasized"
+  },
+  {
+    "id": "budget-05",
+    "dimension": "budget",
+    "query": "không quan tâm giá cứ ngon là được",
+    "expected_fields": ["budget", "quality", "rating"],
+    "notes": "No budget constraint, prioritize quality"
+  },
+  {
+    "id": "time-01",
+    "dimension": "time",
+    "query": "sáng sớm ăn gì 6 giờ sáng",
+    "expected_fields": ["time", "breakfast", "open_now"],
+    "notes": "Must suggest breakfast places open early"
+  },
+  {
+    "id": "time-02",
+    "dimension": "time",
+    "query": "trưa nay nhanh nhanh ăn gì 30 phút",
+    "expected_fields": ["time", "lunch", "speed"],
+    "notes": "Fast lunch options"
+  },
+  {
+    "id": "time-03",
+    "dimension": "time",
+    "query": "chiều muộn 4 giờ ăn nhẹ gì không",
+    "expected_fields": ["time", "snack", "afternoon"],
+    "notes": "Light afternoon snack"
+  },
+  {
+    "id": "time-04",
+    "dimension": "time",
+    "query": "khuya đói 11 giờ đêm ăn gì",
+    "expected_fields": ["time", "late_night", "open_now"],
+    "notes": "Late night, must check open_now"
+  },
+  {
+    "id": "time-05",
+    "dimension": "time",
+    "query": "brunch cuối tuần ăn gì",
+    "expected_fields": ["time", "brunch", "weekend"],
+    "notes": "Weekend brunch context"
+  },
+  {
+    "id": "group-01",
+    "dimension": "group",
+    "query": "1 mình ăn trưa gợi ý quán nào",
+    "expected_fields": ["group_size", "solo_dining", "location"],
+    "notes": "Solo dining, counter/small table ok"
+  },
+  {
+    "id": "group-02",
+    "dimension": "group",
+    "query": "2 vợ chồng đi ăn tối lãng mạn",
+    "expected_fields": ["group_size", "ambiance", "couple"],
+    "notes": "Romantic setting for couple"
+  },
+  {
+    "id": "group-03",
+    "dimension": "group",
+    "query": "nhóm 4 bạn đi ăn cuối tuần",
+    "expected_fields": ["group_size", "seating_capacity", "social"],
+    "notes": "Group seating, sharing-style food good"
+  },
+  {
+    "id": "group-04",
+    "dimension": "group",
+    "query": "gia đình có trẻ con đi ăn nhà hàng",
+    "expected_fields": ["group_size", "family_friendly", "kids"],
+    "notes": "Family-friendly, must be kid-safe"
+  },
+  {
+    "id": "group-05",
+    "dimension": "group",
+    "query": "team 10 người công ty muốn đặt bàn",
+    "expected_fields": ["group_size", "seating_capacity", "reservation"],
+    "notes": "Large group, need big table/private room"
+  }
+]
