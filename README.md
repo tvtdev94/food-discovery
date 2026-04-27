@@ -4,33 +4,33 @@
 
 # 🍜 Food Discovery Assistant
 
-### *"Hôm nay ăn gì?" — Trả lời trong 3 giây.*
+### *"What should I eat today?" — answered in 3 seconds.*
 
-**Trợ lý AI gợi ý ăn uống Việt Nam đầu tiên hiểu bạn thật sự.**
-Nói tâm trạng — chọn ngân sách — nhận về 5 quán thật, gần bạn, kèm lý do tại sao phù hợp.
+**The first AI food assistant for Vietnam that actually gets you.**
+Tell it your mood, set your budget, get 5 real places nearby — each with a reason why it fits.
 
 [![Made in Vietnam](https://img.shields.io/badge/Made%20in-Vietnam-da251d?style=for-the-badge)](https://github.com/tvtdev94/food-discovery)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![Demo](https://img.shields.io/badge/Live-Demo-22c55e?style=for-the-badge)](https://github.com/tvtdev94/food-discovery)
 
-[Tính năng](#-tính-năng-nổi-bật) • [Demo](#-demo) • [Cài đặt](#-cài-đặt-nhanh) • [Roadmap](#-roadmap)
+[Features](#-key-features) • [Demo](#-demo) • [Quick Start](#-quick-start)
 
 </div>
 
 ---
 
-## ✨ Tại sao có app này?
+## ✨ Why this app?
 
-> *"Trưa nay ăn gì?" — câu hỏi tốn năng lượng nhất trong ngày.*
+> *"What's for lunch?" — the most exhausting question of the day.*
 
-Google Maps cho bạn **danh sách quán**. Food Discovery cho bạn **một quyết định**.
+Google Maps gives you **a list of places**. Food Discovery gives you **a decision**.
 
-| Vấn đề cũ | Cách của chúng tôi |
+| The old pain | Our way |
 |---|---|
-| Quá nhiều quán → tê liệt | **5 gợi ý** đã được AI lọc theo bối cảnh |
-| Review chung chung | **Lý do cá nhân hoá**: trời mưa → quán có mái che |
-| Không biết quán nào còn mở | Tích hợp **giờ mở thực tế** |
-| Tiếng Việt rời rạc | **VI-first**: hiểu "đói lắm rồi", "chán cơm" |
+| Too many options → choice paralysis | **5 picks** filtered by AI for your context |
+| Generic reviews | **Personal reasons**: it's raining → spots with covered seating |
+| No clue if a place is open | Built-in **real opening hours** |
+| Broken Vietnamese UX | **VI-first**: understands "I'm starving", "tired of rice" |
 
 <div align="center">
 
@@ -40,32 +40,32 @@ Google Maps cho bạn **danh sách quán**. Food Discovery cho bạn **một quy
 
 ---
 
-## 🌟 Tính năng nổi bật
+## 🌟 Key features
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 🧠 Hiểu bạn theo bối cảnh
-AI đọc **vị trí + thời tiết + giờ trong ngày** trước khi gợi ý. Trời mưa? Đói? Buổi sáng? Mỗi gợi ý đều có lý do riêng.
+### 🧠 Context-aware
+The AI checks your **location, weather, and time of day** before suggesting. Rainy? Hungry? Late lunch? Every pick has its reason.
 
-### ⚡ Trả lời tức thì
-Nhìn AI suy nghĩ live — không chờ. Streaming từng câu chữ ra màn hình.
+### ⚡ Instant answers
+Watch the AI think live — no waiting. Words stream onto the screen as they're generated.
 
-### 📍 Vị trí chính xác
-GPS, tìm theo tên quận/đường, hoặc tự dò qua mạng — luôn có cách định vị bạn.
+### 📍 Accurate location
+GPS, search by district or street name, or auto-detect via network — we always know where to look.
 
 </td>
 <td width="50%" valign="top">
 
-### 💾 Không mất dữ liệu
-Chat khách → đăng nhập → lịch sử **tự động merge**. Không phải chat lại từ đầu.
+### 💾 Never lose your data
+Chat as a guest → sign in → your history **auto-merges**. Pick up right where you left off.
 
-### ❤️ Lưu quán yêu thích
-Đánh dấu quán hợp gu. Lần sau hỏi "ăn gì?", bot ưu tiên gợi ý phong cách bạn thích.
+### ❤️ Save what you love
+Star the spots that match your taste. Next time you ask "what should I eat?", the bot leans into your style.
 
-### 🇻🇳 Viết bằng tiếng Việt thật
-Bot nói chuyện ấm áp, hiểu slang. Không dịch máy — viết tay từng dòng.
+### 🇻🇳 Truly Vietnamese
+The bot speaks warm, idiomatic Vietnamese. Hand-crafted — not machine-translated.
 
 </td>
 </tr>
@@ -81,49 +81,49 @@ Bot nói chuyện ấm áp, hiểu slang. Không dịch máy — viết tay từ
 
 </div>
 
-> 🧑 **Bạn:** *"Đói lắm, gần Bách Khoa, dưới 50k thôi"*
+> 🧑 **You:** *"Starving, near Bach Khoa University, under 50k"*
 >
-> 🤖 **Bot:** *"Hiểu rồi 🍜 Mình chọn 5 quán — đều dưới 50k, đi bộ 5 phút từ cổng Parabol:*
-> *1. **Phở Thìn — 38k** — đông sinh viên giờ này, nước trong*
-> *2. **Bún chả Tuyết — 45k** — mở 11h-14h, ăn lẹ kịp giờ học*
+> 🤖 **Bot:** *"Got you 🍜 Here are 5 spots — all under 50k, 5-min walk from the Parabol gate:*
+> *1. **Phở Thìn — 38k** — packed with students right now, clean broth*
+> *2. **Bún chả Tuyết — 45k** — open 11am–2pm, quick in and out*
 > *3. ..."*
 
 ---
 
-## 🗺️ App làm được gì?
+## 🗺️ What this app does
 
 ```mermaid
 mindmap
   root((Food Discovery))
-    Hiểu bạn
-      Tâm trạng
-      Ngân sách
-      Thời tiết
-      Giờ trong ngày
-    Định vị
-      GPS chính xác
-      Tìm theo tên
-      Tự dò qua mạng
-    Gợi ý
-      5 quán thật
-      Lý do cá nhân
-      Còn mở hay không
-    Ghi nhớ
-      Lịch sử chat
-      Quán yêu thích
-      Đăng nhập merge
+    Understand you
+      Mood
+      Budget
+      Weather
+      Time of day
+    Locate
+      Precise GPS
+      Search by name
+      Network fallback
+    Suggest
+      5 real places
+      Personal reasons
+      Open right now
+    Remember
+      Chat history
+      Favorite spots
+      Sign-in merge
 ```
 
 ---
 
-## 🚀 Cài đặt nhanh
+## 🚀 Quick start
 
-### Yêu cầu
+### Requirements
 - Node.js **>= 20**
 - pnpm **>= 9**
-- Tài khoản free: [Supabase](https://supabase.com) · [Upstash](https://upstash.com) · [OpenAI](https://platform.openai.com) · [Google Cloud](https://console.cloud.google.com)
+- Free accounts: [Supabase](https://supabase.com) · [Upstash](https://upstash.com) · [OpenAI](https://platform.openai.com) · [Google Cloud](https://console.cloud.google.com)
 
-### Chạy 3 bước
+### Run in 3 steps
 
 ```bash
 # 1. Clone & install
@@ -131,39 +131,16 @@ git clone https://github.com/tvtdev94/food-discovery.git
 cd food-discovery
 pnpm install
 
-# 2. Tạo .env.local từ template, điền các key cần thiết
+# 2. Create .env.local from the template, fill in the required keys
 cp .env.example .env.local
 
-# 3. Chạy
+# 3. Run
 pnpm dev
 ```
 
-Mở `http://localhost:3000` → hỏi *"trưa nay ăn gì?"* 🎉
+Open `http://localhost:3000` → ask *"what should I eat for lunch?"* 🎉
 
-> 📖 Hướng dẫn chi tiết (Supabase migration, các biến môi trường, deploy Vercel) có trong thư mục `docs/`.
-
----
-
-## 📊 Roadmap
-
-- [x] **MVP** — Chat + 5 gợi ý + favorites + history + đăng nhập
-- [x] **Pre-warm cache** — Tốc độ phản hồi nhanh hơn
-- [x] **Eval suite** — 30 câu hỏi tiếng Việt kiểm tra chất lượng
-- [ ] **Cá nhân hoá sâu** — Học từ favorites + history
-- [ ] **Đặt cùng nhóm** — "4 người ăn gì cùng?"
-- [ ] **Đặt bàn online** — Tích hợp Foody / Now / Loship
-- [ ] **PWA + offline** — Xem favorites không cần mạng
-- [ ] **Đa ngôn ngữ** — EN / JA cho khách du lịch
-
----
-
-## 🤝 Đóng góp
-
-PRs welcome! Trước khi gửi:
-
-1. Fork repo & tạo branch: `git checkout -b feat/your-feature`
-2. Commit theo [Conventional Commits](https://www.conventionalcommits.org/)
-3. Mở PR
+> 📖 Detailed setup (Supabase migration, env vars, Vercel deploy) lives in the `docs/` folder.
 
 ---
 
@@ -175,6 +152,6 @@ MIT © [tvtdev94](https://github.com/tvtdev94)
 
 <div align="center">
 
-**Built with ❤️ in Vietnam — for everyone tired of saying "ăn gì cũng được"**
+**Built with ❤️ in Vietnam — for everyone tired of saying "anything works"**
 
 </div>
