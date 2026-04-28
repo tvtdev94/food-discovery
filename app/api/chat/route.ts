@@ -135,14 +135,14 @@ export async function POST(req: NextRequest): Promise<Response> {
   // Detect client disconnect via the request signal (Next.js wires this for us).
   req.signal.addEventListener("abort", () => abortController.abort(), { once: true });
 
-  // --- 60s timeout guard ---
-  // Reduced from 90s after Pass-2 split: parallel text-stream + structured recs
-  // typically completes in 10-15s P50. 60s ceiling absorbs cold LLM cache outliers.
+  // --- 90s timeout guard ---
+  // Eval Round 1 (2026-04-29) showed 8/30 timeouts at 60s ceiling — full pipeline
+  // with cold cache + structured Pass-2 sometimes hits 70s+. Bump to 90s.
   const timeoutId = setTimeout(() => {
     abortController.abort();
     write("error", { code: "timeout", message: "Não mình hơi đờ. Thử lại nha." });
     close();
-  }, 60_000);
+  }, 90_000);
 
   // Log message metadata — never log full content (PII).
   const msgPreview = message.slice(0, 20);

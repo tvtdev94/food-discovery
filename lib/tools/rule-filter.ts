@@ -4,13 +4,15 @@ import type { Place, FilterOpts } from "@/lib/tools/types";
 
 /**
  * Applies quality filters then sorts by rating descending.
- * Defaults relaxed for VN market: minRating=3.5, minReviews=3.
+ * Defaults relaxed for VN market: minRating=3.5, minReviews=2.
+ * Reduced minReviews 3→2 after Eval Round 1 (2026-04-29) showed many quán
+ * lề đường có ít reviews nhưng chất lượng tốt bị loại.
  * openNow filter: honoured only when caller explicitly sets true AND place has a
  * non-null `openNow` — SearchApi open_state parsing is heuristic, so null places
  * pass through rather than silently dropping.
  */
 export function ruleFilter(places: Place[], opts: FilterOpts = {}): Place[] {
-  const { minRating = 3.5, minReviews = 3, openNow } = opts;
+  const { minRating = 3.5, minReviews = 2, openNow } = opts;
   return places
     .filter(
       (p) =>

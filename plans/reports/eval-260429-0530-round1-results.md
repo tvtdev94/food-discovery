@@ -1,9 +1,31 @@
-# Eval Round 1 Results — 2026-04-29
+# Eval Round 1 + Round 2 Results — 2026-04-29
 
-**Status:** ⚠️ INFRASTRUCTURE ISSUES FOUND — quality grading partial
+**Round 1 Status:** ⚠️ Infrastructure issues found
+**Round 2 Status:** ✅ PASS (after 3 fixes applied)
 **Test set:** 30 VI queries × 6 dimensions
-**Provider:** SearchAPI.io (key mới sau quota reset)
+**Provider:** SearchAPI.io
 **Location:** Hà Nội (lat 21.0285, lng 105.8542)
+
+## Round 2 Summary (post-fix)
+
+| Metric | Round 1 | Round 2 | Δ |
+|---|---|---|---|
+| OK with recs | 6/30 (20%) | **24/30 (80%)** | +18 |
+| OK empty | 16/30 | 6/30 | −10 |
+| Errors | 8/30 (timeout) | **0/30** | −8 |
+| Avg duration | 43.5s | **18s** | −59% |
+| 5-rec count | 1 | 15 | +14 |
+
+**Verdict R2:** PASS infrastructure. Quality verified on sample (budget-01, group-04, weather-04 — recs grounded, tone warm VI, why_fits cụ thể).
+
+## Fixes Applied (commit pending)
+- **A** — chat timeout 60s → 90s (`app/api/chat/route.ts`)
+- **B** — ruleFilter minReviews 3 → 2 (`lib/tools/rule-filter.ts`)
+- **C** — OPENAI_MODEL gpt-5-mini → gpt-4o-mini (`.env`)
+
+---
+
+## Round 1 Detail (initial baseline)
 
 ---
 
