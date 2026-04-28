@@ -1,6 +1,6 @@
 # Ops Runbook — food-discovery
 
-Phiên bản: v1 MVP | Cập nhật: 2026-04-21
+Phiên bản: v1.1 Beta | Cập nhật: 2026-04-28
 
 ---
 
@@ -86,3 +86,64 @@ chat vẫn hoạt động (fire-and-forget) nhưng history mất.
 2. Nếu một loại lỗi spam → thêm `ignoreErrors` trong `Sentry.init` → redeploy.
 3. Hạ `sampleRate` server xuống `0.1` tạm thời nếu quota sắp hết.
 4. Đặt Sentry rate limit alert tại 80% quota (Settings → Alerts → Spike Protection).
+
+---
+
+## 5. Deploy Procedure
+
+Xem chi tiết tại `docs/deployment-guide.md`. Quick reference:
+
+```bash
+# Preview
+vercel deploy
+
+# Smoke test preview URL: /, /api/health, /api/share, /admin/stats
+
+# Promote
+vercel deploy --prod
+```
+
+**Pre-deploy checklist:**
+- [ ] `pnpm test` all pass (≥216 cases)
+- [ ] `pnpm typecheck` clean
+- [ ] `pnpm lint` no new violations
+- [ ] DB migration applied (`supabase db push`)
+- [ ] Env vars verified (`vercel env ls production`)
+
+---
+
+## 6. Rollback Procedure
+
+Nếu deploy mới gây regression:
+
+```bash
+# Option A: CLI
+vercel rollback https://<previous-deployment-url>
+
+# Option B: Web dashboard
+# Vercel → Deployments → [previous green deploy] → "Promote to Production"
+```
+
+**Khi nào rollback:**
+- 5xx rate >5% trong 5 phút
+- Sentry critical issue mới sau deploy
+- /api/health red >2 lần trong 10 phút
+
+**Sau rollback:**
+1. Note rollback reason vào Sentry (tag deploy ID)
+2. Tạo issue Github mô tả regression
+3. Fix trên branch riêng + test trước khi re-deploy
+
+---
+
+## 7. Share Link Cleanup (Future)
+
+Hiện chưa có TTL trên `shared_recommendations`. Khi DB approach 1M rows hoặc table size >1GB:
+
+```sql
+-- Clean shares >90 ngày
+DELETE FROM shared_recommendations
+WHERE created_at < NOW() - INTERVAL '90 days';
+```
+
+Setup pg_cron job sau khi scale lên 1k+ user. Beta scale OK không cleanup.

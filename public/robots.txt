@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/admin/
+Disallow: /api/
+
+# /s/[shortId] pages have noindex meta tag in code; FB/Zalo crawlers still
+# fetch them for OG preview (User-agent: facebookexternalhit, etc).

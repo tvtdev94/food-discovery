@@ -43,3 +43,5 @@ Thumbs.db
 
 # eval outputs
 evals/results/
+
+.vercel
