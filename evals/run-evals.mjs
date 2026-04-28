@@ -36,7 +36,10 @@ const FAKE_LOCATION = {
   label: "Hà Nội",
 };
 
-const FAKE_DEVICE_ID = "eval-runner-device-001";
+// Unique device_id per query — sidesteps chat session rate limit (20/10m/device).
+function fakeDeviceId(queryId) {
+  return `eval-${queryId}-${Date.now()}`;
+}
 
 // ---------------------------------------------------------------------------
 // Inline SSE parser (Node streams — no browser ReadableStream needed)
@@ -88,11 +91,12 @@ async function* parseSseResponse(response) {
 
 async function runQuery(query) {
   const startMs = Date.now();
+  const deviceId = fakeDeviceId(query.id);
 
   const body = JSON.stringify({
     message: query.query,
     activeLocation: FAKE_LOCATION,
-    deviceId: FAKE_DEVICE_ID,
+    deviceId,
   });
 
   let response;
@@ -101,7 +105,7 @@ async function runQuery(query) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-device-id": FAKE_DEVICE_ID,
+        "x-device-id": deviceId,
       },
       body,
     });
@@ -137,8 +141,10 @@ async function runQuery(query) {
     for await (const { event, data } of parseSseResponse(response)) {
       switch (event) {
         case "message_delta":
-          if (typeof data === "string") assistantMessage = data;
-          else if (data?.text) assistantMessage = data.text;
+          // Phase 9a: APPEND semantics — chunks accumulate.
+          if (typeof data === "string") assistantMessage += data;
+          else if (data?.text) assistantMessage += data.text;
+          else if (data?.delta) assistantMessage += data.delta;
           break;
 
         case "recs_delta":
