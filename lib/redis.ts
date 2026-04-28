@@ -71,3 +71,11 @@ export const ratelimitChatSuggestions = new Ratelimit({
   prefix: "rl:chat:suggestions",
   analytics: false,
 });
+
+// Share link: 5 shares/h/owner_key. Prevents spam of viral share links.
+export const ratelimitShare = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, "1 h"),
+  analytics: true,
+  prefix: "rl:share",
+});

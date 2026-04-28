@@ -1,14 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
+import { Share2, Loader2 } from "lucide-react";
 import { RestaurantCard } from "@/components/chat/restaurant-card";
 import { RestaurantCardSkeleton } from "@/components/chat/restaurant-card-skeleton";
 import { LoadingChecklist } from "@/components/chat/loading-checklist";
+import { ShareSheet } from "@/components/chat/share-sheet";
 import { ApiError } from "@/components/error-states/api-error";
 import { RateLimited } from "@/components/error-states/rate-limited";
 import { NetworkError } from "@/components/error-states/network-error";
 import { extractSuggestions } from "@/lib/chat/extract-suggestions";
 import { hapticLight } from "@/lib/haptics";
+import { getOrCreateDeviceId } from "@/hooks/use-active-location";
+import { toast } from "@/hooks/use-toast";
 import type { ChatMessage, ErrorCode, MessagePhase } from "@/hooks/use-chat-stream";
 
 interface ActiveLocationArg {
@@ -47,6 +52,43 @@ export function AssistantMessage({
 
   const isStreaming = status === "streaming";
   const isError = status === "error";
+
+  // Share link state
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  async function handleShare() {
+    if (!message.id) return;
+    hapticLight();
+    setShareLoading(true);
+    try {
+      const deviceId = getOrCreateDeviceId();
+      const res = await fetch("/api/share", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-device-id": deviceId,
+        },
+        body: JSON.stringify({ message_id: message.id }),
+      });
+      if (!res.ok) {
+        const json = (await res.json().catch(() => ({}))) as { error?: string };
+        const msg = json.error === "rate_limited"
+          ? "Bạn đã chia sẻ quá nhiều lần, thử lại sau 1 tiếng."
+          : "Không thể tạo link chia sẻ. Vui lòng thử lại.";
+        toast({ title: "Lỗi", description: msg, duration: 4000 });
+        return;
+      }
+      const data = (await res.json()) as { shortId: string; url: string };
+      setShareUrl(data.url);
+      setSheetOpen(true);
+    } catch {
+      toast({ title: "Lỗi mạng", description: "Kiểm tra kết nối và thử lại.", duration: 4000 });
+    } finally {
+      setShareLoading(false);
+    }
+  }
 
   const hasRecs = Array.isArray(recommendations) && recommendations.length > 0;
   const allSkeletonRecs =
@@ -158,9 +200,38 @@ export function AssistantMessage({
                 <RestaurantCard rec={rec} activeLocation={activeLocation} index={i} />
               </div>
             ))}
+
+            {/* Share button — only shown when recs are fully loaded */}
+            {!isStreaming && (
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  disabled={shareLoading}
+                  aria-label="Chia sẻ gợi ý này"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-primary/30
+                             bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary
+                             transition-all duration-150 hover:bg-primary/10 hover:border-primary/50
+                             active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed
+                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {shareLoading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  )}
+                  Chia sẻ
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {/* Share sheet — rendered outside content column to avoid layout shift */}
+      {shareUrl && (
+        <ShareSheet open={sheetOpen} onOpenChange={setSheetOpen} url={shareUrl} />
+      )}
     </div>
   );
 }
