@@ -1,6 +1,6 @@
 # Codebase Summary — Food Discovery MVP
 
-Generated: 2026-04-21 | Stack: Next.js 15 App Router + TS + Tailwind/shadcn + Supabase + Upstash Redis + OpenAI Responses API + Google Places (New)
+Generated: 2026-04-21 | Updated: 2026-04-28 | Stack: Next.js 15 App Router + TS + Tailwind/shadcn + Supabase + Upstash Redis + OpenAI Responses API + Google Places (New)
 
 ---
 
@@ -125,27 +125,36 @@ food-discovery/
 ## Library Utilities (`lib/`)
 
 ### Chat Pipeline
-- **`responses-runner.ts`** (390 LOC) — orchestrates 2-pass LLM:
-  - Pass 1: `find_places` tool dispatch (weather, places, rule-filter).
-  - Pass 2: structured output (place_id enum from filtered list).
-  - Emits SSE events: `tool_start`, `tool_end`, `places_filtered`, `recs_delta`, `message_delta`, `done`, `error`.
-  - **Tech debt:** C2 pass-2 `response_format` wrong shape; C3 open redirect in `safeNext`.
 
-- **`dispatch-tools.ts`** — parse tool_calls, invoke tool handler, return result. Currently: `find_places`, `get_weather`, `get_geocode`.
+**Runner (`lib/chat/runner/`)** — Modular split of legacy `responses-runner.ts` (Phase 9a):
+- **`runner.ts`** — orchestrator. Builds input messages, kicks `speculativeFindPlaces` non-blocking, runs Pass 1 tool loop, then Promise.allSettled(`runPass2TextStream`, `runPass2Recs`). Emits SSE events: `tool_start`, `tool_end`, `places_filtered`, `recs_delta`, `message_delta`, `done`, `error`.
+- **`pass1-tool-loop.ts`** — Pass 1 dispatch loop. Iterates tool_calls (`find_places`, `get_weather`, `get_geocode`) until LLM stops calling tools.
+- **`pass2-recs-structured.ts`** — Pass 2 structured JSON output. `text.format.json_schema` strict mode with `place_id` enum from filtered list. Hydrates snapshots; drops hallucinated IDs. Emits one `recs_delta`.
+- **`pass2-text-stream.ts`** — Pass 2 streaming text. OpenAI streaming API for VI message body. Emits chunked `message_delta` (APPEND semantics).
+- **`runner-openai-client.ts`** — OpenAI SDK singleton + `gpt-4o-mini` fallback wrapper.
+- **`runner-helpers.ts`** — utilities: `buildInputMessages`, `extractTextFromMessage`, `collectPlacesFromOutputs`.
+- **`runner-types.ts`** — shared TS interfaces: `FunctionCallItem`, `MessageOutputItem`, `RunChatTurnParams`.
+- **`speculative-fetch.ts`** — Wave 9c: heuristic-based parallel `findPlaces` keyed off cuisine keyword extracted from user message. Cache-warms Redis 500–1500ms before Pass 1 dispatch.
+- **`expand-search.ts`** — fallback when filtered results <3; widens distance/rating thresholds.
 
+**Legacy facade:**
+- **`responses-runner.ts`** — 10-LOC re-export from `runner/runner.ts` for back-compat.
+
+**Other chat modules:**
+- **`dispatch-tools.ts`** — parse tool_calls, invoke handler. Currently: `find_places`, `get_weather`, `get_geocode`.
 - **`load-history.ts`** — fetch conversation + messages + recommendations from Supabase (service-role).
-
-- **`persist-turn.ts`** — insert conversation, messages, recommendations into Supabase. Fire-and-forget on `/api/chat` exit.
-
-- **`response-schema.ts`** — builds JSON Schema for pass-2 structured output. `place_id` enum constrained to filtered place IDs.
-
-- **`system-prompt.ts`** — system message. VI-first tone instruction. Specifies 2-pass flow + tool constraints.
-
-- **`persona-prompt-v2.ts`** — character prompt (persona for "food buddy"). Tuned for VI tone, casual+friendly.
-
-- **`tool-schemas.ts`** — Zod + JSON Schema for tool arguments. `FindPlacesArgs`, `GetWeatherArgs`, `GetGeocodeArgs`.
-
-- **`sse.ts`** — SSE encoding/decoding. `sseEncode(event, data)` → `data: <json>`, `parseSSE(text)` → `{ event, data }`.
+- **`persist-turn.ts`** — insert conversation, messages, recommendations. Fire-and-forget on `/api/chat` exit.
+- **`response-schema.ts`** — JSON Schema builder for Pass 2 structured output. `place_id` enum constrained to filtered place IDs.
+- **`system-prompt.ts`** — system message. VI-first tone; 2-pass flow + tool constraints.
+- **`persona-prompt-v2.ts`** — character prompt for "food buddy". Tuned VI tone, casual+friendly.
+- **`tool-schemas.ts`** — Zod + JSON Schema for tool args. `FindPlacesArgs`, `GetWeatherArgs`, `GetGeocodeArgs`.
+- **`sse.ts`** — SSE encoding/decoding. `sseEncode(event, data)`, `parseSSE(text)`.
+- **`prewarm-cache.ts`** — Wave 9c: time-bucket query generator for `/api/chat/prewarm`.
+- **`intro-pool.ts`** — Wave 9c: 5 VI random intro strings for optimistic UI.
+- **`loading-copy.ts`** — Wave 9d: ticker pools + checklist labels + fake quán names.
+- **`build-suggestions-context.ts`** — Wave 9e: hour bucket + weather key + cache key for chips.
+- **`llm-suggestions.ts`** — Wave 9e: server-only LLM caller for chip generation.
+- **`extract-suggestions.ts`** — Wave 9e: helper for parsing chip output.
 
 ### Tools
 - **`tools/places.ts`** — Google Places Text Search API wrapper. Applies field masking, caching (10m TTL), budget guard.
@@ -282,18 +291,15 @@ Vitest coverage (Node environment). Currently ~12 test files:
 
 ## Tech Debt & Known Issues
 
-**File size violations (>200 LOC, Phase 9 refactor):**
-- `lib/chat/responses-runner.ts` (390 LOC) → split into orchestrator + event-emitter
-- `hooks/use-chat-stream.ts` (413 LOC) → extract parser + state machine
-- `app/page.tsx` (251 LOC) → split into components
+**File size violations (>200 LOC):**
+- ✅ `lib/chat/responses-runner.ts` — RESOLVED via Phase 9a split into 6 modules (each ≤150 LOC) under `lib/chat/runner/`
+- `hooks/use-chat-stream.ts` (413 LOC) — defer (Wave Completion-roadmap §F or later)
+- `app/page.tsx` (251 LOC) — defer (acceptable for now)
 
-**Critical bugs (Phase 9 or immediate fix):**
-- C1: `recs_delta` double-JSON-encoded on wire → client can't parse
-- C2: Pass-2 uses Chat Completions shape; Responses API expects `text.format` shape
-- C3–C5: Security issues (open redirect, device_id hijack, admin key default)
-- H1–H7: Rate limit, error leak, favorites N+1, AbortController missing, etc.
+**Critical bugs:** ✅ All Fixed (verified 2026-04-28)
+- C1-C5 + H1-H7 — see `docs/development-roadmap.md` §9b for fix locations.
 
-See `plans/reports/code-reviewer-260421-1347-food-discovery-mvp.md` for full list.
+See `plans/reports/code-reviewer-260421-1347-food-discovery-mvp.md` for full historical list.
 
 ---
 

@@ -1,6 +1,31 @@
 # Project Changelog — Food Discovery
 
-**Format:** Semantic Versioning | **Last Updated:** 2026-04-27
+**Format:** Semantic Versioning | **Last Updated:** 2026-04-28
+
+---
+
+## [Unreleased] — Phase 9b Hardening Verification (2026-04-28)
+
+### Verified (no code changes — doc sync only)
+- **C1** `recs_delta` encoding — verified fixed in `lib/chat/runner/pass2-recs-structured.ts:116`. Object passed (not string); client decodes once.
+- **C2** Pass-2 Responses API shape — verified `text:{format:{type:"json_schema",strict:true,schema}}` pattern in `pass2-recs-structured.ts:59-66`.
+- **C3** Open redirect on auth callback — verified `safeNext()` applied in `app/auth/callback/route.ts:16` + `app/api/auth/merge-guest/route.ts`.
+- **C4** Device_id hijack — verified cookie-only read with mismatch validation (returns 403) in `app/api/auth/merge-guest/route.ts:41-55`.
+- **C5** ADMIN_KEY default removed — verified `.min(16)` required, no default in `lib/env.ts:16`.
+- **H1** AbortController on location fetches — verified in `lib/location/nominatim.ts` + `lib/location/ip-geolocate.ts` (5s timeout).
+- **H2** Health endpoint error hiding — verified `app/api/health/route.ts:45-51` returns ok/error only; details logged server-side.
+- **H3** Geocode IP+session double-limit — verified in `app/api/location/search/route.ts:24-41`.
+- **H4** `/api/location/ip` rate limit — verified `ratelimitIpGeo.limit(ip)` enforced.
+- **H5** Favorites N+1 — verified Zustand store with `fetchOnce()` in `hooks/use-favorites.ts`.
+- **H6** Nested button — verified `role="button"` in `components/chat/restaurant-card.tsx:121`.
+- **H7** SSE AbortController — verified plumbing through orchestrator + client cleanup.
+
+### Documentation
+- `docs/development-roadmap.md` — Phase 9b marked ✅ Complete. Each C/H entry now shows fix file path + line.
+- `docs/codebase-summary.md` — Refactored "Chat Pipeline" section to reflect `lib/chat/runner/` modular split (replaces stale 390 LOC monolith reference).
+
+### No Code Changes
+Pure doc sync. All fixes shipped during Phase 9a refactor (Apr 26) and Phase 9b hardening passes (Apr 27-28).
 
 ---
 

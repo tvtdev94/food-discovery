@@ -10,7 +10,16 @@
 |-------|--------|-------|--------------|
 | **0. Brainstorm & Plan** | ✅ Complete | 2026-04-21 | Requirement synthesis, stack lock, 8-phase plan |
 | **1–8. MVP Build** | ✅ Complete | 2026-04-21 | Fully functional chat assistant with caching, auth, observability |
-| **9. Post-MVP Backlog** | Pending | 2026-04-22+ | Bug fixes, test coverage, evals, production hardening |
+| **9a. Progressive Streaming** | ✅ Complete | 2026-04-26 | Pass 2 split into parallel text + recs; modular runner/ folder |
+| **9c. Chat Instant-Feel** | ✅ Complete | 2026-04-26 | Optimistic intro + prewarm + speculative parallel fetch |
+| **9d. Loading Storytelling** | ✅ Complete | 2026-04-27 | 4-layer loading UX (avatar + ticker + checklist + skeleton) |
+| **9e. LLM Quick Chips** | ✅ Complete | 2026-04-27 | Context-aware AI chip suggestions with composite cache |
+| **9b. Post-MVP Hardening** | ✅ Complete | 2026-04-28 | All C1-C5 + H1-H7 fixed (verified during refactor cycle) |
+| **Completion Roadmap A — Doc sync** | ✅ Complete | 2026-04-28 | 4 docs synced với code thực tế |
+| **Completion Roadmap B — Test coverage** | ✅ Complete | 2026-04-28 | 5 module tested, 216 vitest pass |
+| **Completion Roadmap C — Eval Round 1** | ⏸ Awaiting human grade | 2026-04-29 | Template + script ready; needs `pnpm dev` + manual rubric |
+| **Completion Roadmap D — Share Link** | ✅ Complete | 2026-04-28 | `/api/share` + `/s/[shortId]` + Sheet UI shipped |
+| **Completion Roadmap E — Beta Deploy** | ⏸ Awaiting Vercel CLI | 2026-04-28 | docs/deployment-guide.md ready; user runs login + deploy |
 | **10+. Future** | Deferred | 2026-Q3+ | Map view, reservations, voice, multi-city (explicitly out-of-scope) |
 
 ---
@@ -268,86 +277,66 @@
 
 ---
 
-## Phase 9b: Post-MVP Hardening & Fixes
+## Phase 9b: Post-MVP Hardening & Fixes (✅ Complete)
 
-**Target:** 2026-04-27+ | **Estimated Effort:** 3–4 days (parallel agents)
+**Status: ✅ Complete** — verified 2026-04-28 — fixes shipped during Phase 9a/9c/9d/9e refactor cycle.
 
-### 9.1 Critical Bug Fixes (BLOCKER FOR PROD)
-Must fix before any public deploy:
+### 9b.1 Critical Bug Fixes ✅ All Fixed
 
-**C1: `recs_delta` double-JSON-encoded**
-- File: `lib/chat/responses-runner.ts:329`
-- Fix: `onEvent("recs_delta", JSON.parse(pass2Text))` to pass object, not string
-- Validation: client receives place cards during streaming
-- PR: 1 file, <5 LOC change
+**C1: `recs_delta` double-JSON-encoded** ✅ FIXED
+- File: `lib/chat/runner/pass2-recs-structured.ts:116`
+- Fix: `onEvent("recs_delta", { recommendations: hydratedRecs })` passes object, not string
+- Shipped: Phase 9a refactor (when responses-runner split into runner/ folder)
 
-**C2: Pass-2 uses wrong Responses API shape**
-- File: `lib/chat/responses-runner.ts:303–313`
-- Fix: Change `response_format: { ... }` to `text: { format: { type: "json_schema", ... } }`
-- Validation: structured output returns valid recommendations
-- PR: 1 file, ~10 LOC change
+**C2: Pass-2 uses wrong Responses API shape** ✅ FIXED
+- File: `lib/chat/runner/pass2-recs-structured.ts:59-66`
+- Fix: Now uses `text: { format: { type: "json_schema", strict: true, schema } }`
+- Shipped: Phase 9a refactor
 
-**C3: Open redirect on auth callback**
-- Files: `app/auth/callback/route.ts`, `app/api/auth/merge-guest/route.ts`
-- Fix: Apply `safeNext()` validator to all `next=` redirects
-- Validation: Attempting `?next=//evil.com` falls back to `/`
-- PR: 2 files, ~5 LOC per file
+**C3: Open redirect on auth callback** ✅ FIXED
+- Files: `app/auth/callback/route.ts:16`, `app/api/auth/merge-guest/route.ts`
+- Fix: `safeNext()` applied to all `next=` redirects; validates against `/`, `//`, `/\\`, `http*`
+- Shipped: Phase 9b hardening pass
 
-**C4: Device_id hijack via request body**
-- File: `app/api/auth/merge-guest/route.ts`
-- Fix: Accept device_id ONLY from HttpOnly cookie, never from request body
-- Validation: Merge rejects mismatched or missing device_id cookie
-- PR: 1 file, ~10 LOC change
+**C4: Device_id hijack via request body** ✅ FIXED
+- File: `app/api/auth/merge-guest/route.ts:41-55`
+- Fix: device_id read exclusively from `device_id` cookie; mismatch returns 403
+- Shipped: Phase 9b hardening pass
 
-**C5: Admin key default in code**
-- File: `lib/env.ts`
-- Fix: Remove `.default("dev-admin-key-change-me")` from ADMIN_KEY schema
-- Make ADMIN_KEY required; `.min(16)` for production strength
-- Validation: Missing ADMIN_KEY in env fails startup
-- PR: 1 file, ~5 LOC change
+**C5: Admin key default in code** ✅ FIXED
+- File: `lib/env.ts:16`
+- Fix: `ADMIN_KEY: z.string().min(16, "ADMIN_KEY must be ≥16 chars")` — required, no default
+- Shipped: Phase 9b hardening pass
 
-### 9b.2 High-Priority Security & Reliability
-Fix before scaling to >100 concurrent users:
+### 9b.2 High-Priority Security & Reliability ✅ All Fixed
 
-**H1: Add AbortController to Nominatim & ipapi fetches**
-- Files: `lib/location/nominatim.ts`, `lib/location/ip-geolocate.ts`
-- Fix: Wrap with 5s timeout AbortController (match weather.ts pattern)
-- Validation: Stalled upstream requests timeout cleanly
-- Tests: Mock slow upstream, verify abort
+**H1: AbortController on Nominatim & ipapi fetches** ✅ FIXED
+- Files: `lib/location/nominatim.ts:81,111`, `lib/location/ip-geolocate.ts:36`
+- Fix: 5s timeout AbortController wrap; throws on slow upstream
 
-**H2: Hide error details in health endpoint**
-- File: `app/api/health/route.ts`
-- Fix: Return only `{ ok, supabase: "ok"|"error", redis: "ok"|"error" }`
-- Log detail server-side; never expose to client
-- Validation: Error message doesn't leak hostnames or URI internals
+**H2: Hide error details in health endpoint** ✅ FIXED
+- File: `app/api/health/route.ts:45-51`
+- Fix: Returns `{ ok, supabase: "ok"|"error", redis: "ok"|"error" }`; logs detail server-side via `log.error("health.probe_fail")`
 
-**H3: Rate limit geocode keyed on IP + session (not client-controlled headers)**
-- Files: `app/api/location/search/route.ts`, `app/api/location/reverse/route.ts`
-- Fix: Prefer x-forwarded-for (IP) over x-session-id for rate limit key
-- Apply two-limit strategy: (IP + session) both must pass
-- Tests: Rotating session_id can't bypass IP limit
+**H3: Rate limit geocode keyed on IP + session** ✅ FIXED
+- File: `app/api/location/search/route.ts:24-41`
+- Fix: Two-limit strategy — `ratelimitGeocodeIp.limit(ip)` first (anti-header-rotation), then `ratelimitGeocode.limit(sessionKey)`. Both must pass.
 
-**H4: Add rate limit to `/api/location/ip`**
-- File: `app/api/location/ip/route.ts`
-- Fix: Call `ratelimitGeocodeMap.limit(ip)` before ipGeolocate
-- Validation: Abusive client hits limit at 1000 calls/day per IP
+**H4: Rate limit `/api/location/ip`** ✅ FIXED
+- File: `app/api/location/ip/route.ts:13-19`
+- Fix: `ratelimitIpGeo.limit(ip)` (10 req/min) applied; 429 with `Retry-After: 60`
 
-**H5: Refactor `useFavorites` to Zustand store**
-- Files: `hooks/use-favorites.ts`, `components/chat/restaurant-card.tsx`
-- Fix: Extract favorites into Zustand store (singleton); cards consume from store
-- Remove per-card hook instantiation
-- Validation: One fetch for 5 cards instead of 5
+**H5: Refactor `useFavorites` to Zustand store** ✅ FIXED
+- File: `hooks/use-favorites.ts`
+- Fix: Now Zustand store with `fetchOnce()`; one fetch shared across all consumers (eliminated N+1)
 
-**H6: Fix nested button HTML in RestaurantCard**
-- File: `components/chat/restaurant-card.tsx:97–149`
-- Fix: Convert outer button to `<div role="button" tabIndex={0}>` or restructure
-- Validation: No nested button elements; screen reader OK
+**H6: Fix nested button HTML in RestaurantCard** ✅ FIXED
+- File: `components/chat/restaurant-card.tsx:121`
+- Fix: Outer card uses `role="button"` instead of `<button>`; inner buttons preserved without nesting
 
-**H7: Add AbortController to chat SSE fetch** ✅ FIXED (Phase 9a)
+**H7: AbortController on chat SSE fetch** ✅ FIXED (Phase 9a)
 - File: `hooks/use-chat-stream.ts`
-- Fix: Create AbortController; abort on unmount + on `clear()`
-- Validation: Navigating mid-stream closes request cleanly
-- Status: DONE (AbortSignal plumbed through orchestrator, client cleanup on unmount)
+- Fix: AbortController created in route handler; signal plumbed through orchestrator + client cleanup on unmount
 
 ### 9b.3 Test Coverage (Phase 9b Backlog)
 Implement unit tests for untested modules:

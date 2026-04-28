@@ -240,8 +240,8 @@ describe("loadHistory", () => {
 - Error handling: 80%+
 - Utilities: 70%+
 
-Current gaps (Phase 9 backlog):
-- `lib/chat/responses-runner.ts` (390 LOC, untested)
+Current gaps (Wave B test coverage backlog):
+- `lib/chat/runner/runner.ts` (orchestrator end-to-end untested) — Phase 9a split tested individual modules but orchestrator coverage still pending
 - `lib/chat/persist-turn.ts` (untested)
 - `lib/chat/load-history.ts` (untested)
 - `lib/location/ip-geolocate.ts` (untested)
@@ -291,10 +291,10 @@ fix: made it work
 ## Performance & File Size
 
 ### Target: <200 LOC per File
-Current violations (tech debt, Phase 9 refactor):
-- `lib/chat/responses-runner.ts` — 390 LOC → split into orchestrator + event handler
-- `hooks/use-chat-stream.ts` — 413 LOC → extract parser logic + state machine
-- `app/page.tsx` — 251 LOC → split into sub-components
+Current violations:
+- ✅ `lib/chat/responses-runner.ts` — RESOLVED (Phase 9a split into 6 modules in `lib/chat/runner/`, each ≤150 LOC)
+- `hooks/use-chat-stream.ts` — 413 LOC → defer (parser + state machine extract)
+- `app/page.tsx` — 251 LOC → defer (acceptable for now)
 
 When a file approaches 200 LOC during implementation, consider early refactor:
 ```typescript
